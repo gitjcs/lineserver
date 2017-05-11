@@ -11,5 +11,6 @@ def init_config():
 
 
 class Config(object):
-
     DB_PATH = os.path.join(BASE_DIR, 'db', 'lineserver.db')
+    API_HOST = '0.0.0.0'
+    API_PORT = 8001

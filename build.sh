@@ -16,9 +16,19 @@ if [ $? -ne 0 ] ; then
 fi
 
 # Run unit tests
-flake8 .
+# E402 is module level import not at top of file
+flake8 --ignore=E402 .
 
 if [ $? -ne 0 ] ; then
     echo "flake8 issues."
     exit 1
 fi
+
+nosetests tests/
+
+if [ $? -ne 0 ] ; then
+    echo "test failures, aborting build."
+    exit 1
+fi
+
+echo "Success building lineserver."

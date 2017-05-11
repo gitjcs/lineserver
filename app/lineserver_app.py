@@ -1,7 +1,14 @@
+"""
+Entry point for the lineserver flask application
+"""
+import os
+import sys
 from flask import Flask, jsonify
+_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(_root)
+from config import init_config, Config
+from app.exceptions import IndexOutOfRangeException
 from blueprints.lines import lines
-from exceptions import IndexOutOfRangeException
-from db.lines_repository import LinesRepository
 
 app = Flask('lineserver')
 
@@ -15,11 +22,11 @@ def error_413_handler(exc):
     return jsonify({'error': exc.__class__.__name__}), 413
 
 
-@app.errorhandler(Exception)
-def generic_error(exc):
-    return jsonify({'error': exc.__class__.__name__}), 500
-
-
-# Initialize lines repo so we dont re-create a new connection
-# to the sqlite db on every call
-app.lines_repo = LinesRepository()
+if __name__ == '__main__':
+    print("Starting lineserver...")
+    init_config()
+    app.run(host=Config.API_HOST,
+            port=Config.API_PORT,
+            debug=True,
+            use_debugger=True,
+            use_reloader=True)

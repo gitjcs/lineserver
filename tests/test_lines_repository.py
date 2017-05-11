@@ -2,6 +2,7 @@ import os
 import unittest
 from db.lines_repository import LinesRepository
 from app.exceptions import IndexOutOfRangeException
+from app.managers.lines_manager import LinesManager
 
 BASE_DIR = os.path.join(os.path.dirname(__file__), '..')
 
@@ -47,3 +48,20 @@ class LineRepositoryTests(unittest.TestCase):
 
         with self.assertRaises(IndexOutOfRangeException):
             print(self.lines_repo.get_line(101))
+
+    def test_lines_manager(self):
+        # Test the caching of lines managers
+        self._process_file()
+        manager = LinesManager()
+
+        line1a = manager.get_line(1)
+
+        # Getting the same line again should return the same object
+        line1b = manager.get_line(1)
+        self.assertIs(line1b, line1a)
+
+        # If we clear the cache, well get a new object from the db
+        manager.cache.clear()
+
+        line1c = manager.get_line(1)
+        self.assertIsNot(line1c, line1a)
